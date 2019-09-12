@@ -1,5 +1,5 @@
-name: form_validator
-description: A new Flutter project.
+name: Fluttergram
+description: App with pictures
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -27,6 +27,7 @@ dependencies:
   http:
   image_picker:
   mime_type:
+  shared_preferences:
 
 dev_dependencies:
   flutter_test:

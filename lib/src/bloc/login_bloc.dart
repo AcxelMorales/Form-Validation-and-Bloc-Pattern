@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:rxdart/rxdart.dart';
 
-import 'package:form_validator/src/bloc/validators.dart';
+import 'package:Fluttergram/src/bloc/validators.dart';
 
 class LoginBloc with Validators {
   // ----------------- STREAM

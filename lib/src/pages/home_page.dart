@@ -1,19 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:form_validator/src/model/product_model.dart';
 
-import 'package:form_validator/src/providers/products_provider.dart';
-
-import 'package:form_validator/src/bloc/provider.dart';
+import 'package:Fluttergram/src/model/product_model.dart';
+import 'package:Fluttergram/src/providers/products_provider.dart';
+import 'package:Fluttergram/src/bloc/provider.dart';
+import 'package:Fluttergram/src/settings/user_preferences.dart';
 
 class HomePage extends StatelessWidget {
   final productsProvider = ProductsProvider();
+  final _prefs = UserPreferences();
 
   @override
   Widget build(BuildContext context) {
     final bloc = Provider.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Home')),
+      appBar: AppBar(
+        title: Text('Home'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.exit_to_app, color: Colors.white),
+            onPressed: () {
+              this._prefs.token = null;
+              Navigator.pushReplacementNamed(context, 'login');
+            },
+          )
+        ],
+      ),
       body: _createList(),
       floatingActionButton: _createFloatingActionButton(context),
       backgroundColor: Colors.white
@@ -66,7 +78,7 @@ class HomePage extends StatelessWidget {
                 ),
             ListTile(
               leading: Icon(
-                Icons.adjust,
+                Icons.blur_on,
                 color: (product.disponible) ? Colors.green : Colors.red,
               ),
               title: Text(

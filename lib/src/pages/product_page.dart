@@ -3,9 +3,9 @@ import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
 
-import 'package:form_validator/src/model/product_model.dart';
-import 'package:form_validator/src/providers/products_provider.dart';
-import 'package:form_validator/src/utils/app_utils.dart' as utils;
+import 'package:Fluttergram/src/model/product_model.dart';
+import 'package:Fluttergram/src/providers/products_provider.dart';
+import 'package:Fluttergram/src/utils/app_utils.dart' as utils;
 
 class ProductPage extends StatefulWidget {
   @override
