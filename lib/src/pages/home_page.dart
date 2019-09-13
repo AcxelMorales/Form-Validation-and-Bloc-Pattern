@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 
 import 'package:Fluttergram/src/model/product_model.dart';
-import 'package:Fluttergram/src/providers/products_provider.dart';
 import 'package:Fluttergram/src/bloc/provider.dart';
 import 'package:Fluttergram/src/settings/user_preferences.dart';
 
 class HomePage extends StatelessWidget {
-  final productsProvider = ProductsProvider();
   final _prefs = UserPreferences();
 
   @override
   Widget build(BuildContext context) {
-    final bloc = Provider.of(context);
+    final productsBloc = Provider.productsBloc(context);
+    productsBloc.loadProducts();
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
         actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.person),
+            onPressed: () {},
+          ),
           IconButton(
             icon: Icon(Icons.exit_to_app, color: Colors.white),
             onPressed: () {
@@ -26,22 +29,26 @@ class HomePage extends StatelessWidget {
           )
         ],
       ),
-      body: _createList(),
+      body: _createList(productsBloc),
       floatingActionButton: _createFloatingActionButton(context),
       backgroundColor: Colors.white
     );
   }
 
-  Widget _createList() {
-    return FutureBuilder(
-      future: productsProvider.getProducts(),
-      builder: (BuildContext context, AsyncSnapshot<List<ProductModel>> snapshot) {
+  Widget _createList(ProductBloc bloc) {
+    return StreamBuilder(
+      stream: bloc.productsStream,
+      builder: (BuildContext context, AsyncSnapshot<List<ProductModel>> snapshot){
         if (snapshot.hasData) {
           final products = snapshot.data;
 
+          if (products.length == 0) {
+            Navigator.pushReplacementNamed(context, 'login');
+          }
+
           return ListView.builder(
             itemCount: products.length,
-            itemBuilder: (context, i) => _createItem(context, products[i]),
+            itemBuilder: (context, i) => _createItem(context, products[i], bloc),
           );
         } else {
           return Center(child: CircularProgressIndicator());
@@ -50,11 +57,11 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _createItem(BuildContext context, ProductModel product) {
+  Widget _createItem(BuildContext context, ProductModel product, ProductBloc bloc) {
     return Dismissible(
       key: UniqueKey(),
       background: Container(
-        color: Colors.red,
+        color: Colors.redAccent,
         child: Icon(
           Icons.delete,
           color: Colors.white,
@@ -95,7 +102,11 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-      onDismissed: (direction) => productsProvider.deleteProduct(product.id),
+      direction: DismissDirection.startToEnd,
+      onDismissed: (direction) {
+        bloc.deleteProduct(product.id);
+        bloc.loadProducts();
+      },
     );
   }
 

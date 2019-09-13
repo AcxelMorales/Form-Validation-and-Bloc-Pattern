@@ -3,7 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:Fluttergram/src/bloc/login_bloc.dart';
 export 'package:Fluttergram/src/bloc/login_bloc.dart';
 
+import 'package:Fluttergram/src/bloc/product_bloc.dart';
+export 'package:Fluttergram/src/bloc/product_bloc.dart';
+
 class Provider extends InheritedWidget {
+  final _loginBloc   = LoginBloc();
+  final _productBloc = ProductBloc();
+
   static Provider _instance;
 
   factory Provider({ Key key, Widget child }) {
@@ -16,12 +22,14 @@ class Provider extends InheritedWidget {
   
   Provider._internal({ Key key, Widget child }): super(key: key, child: child);
 
-  final loginBloc = LoginBloc();
-
   @override
   bool updateShouldNotify(InheritedWidget oldWidget) => true;
 
   static LoginBloc of (BuildContext context) {
-    return (context.inheritFromWidgetOfExactType(Provider) as Provider).loginBloc;
+    return (context.inheritFromWidgetOfExactType(Provider) as Provider)._loginBloc;
+  }
+
+  static ProductBloc productsBloc (BuildContext context) {
+    return (context.inheritFromWidgetOfExactType(Provider) as Provider)._productBloc;
   }
 }

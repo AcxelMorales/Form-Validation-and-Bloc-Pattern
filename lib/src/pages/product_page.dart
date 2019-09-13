@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
+import 'package:toast/toast.dart';
 
+import 'package:Fluttergram/src/bloc/provider.dart';
 import 'package:Fluttergram/src/model/product_model.dart';
-import 'package:Fluttergram/src/providers/products_provider.dart';
 import 'package:Fluttergram/src/utils/app_utils.dart' as utils;
 
 class ProductPage extends StatefulWidget {
@@ -19,11 +20,12 @@ class _ProductPageState extends State<ProductPage> {
   bool saving = false;
   File photo;
 
-  ProductModel product              = ProductModel();
-  ProductsProvider productsProvider = ProductsProvider();
+  ProductBloc productBloc;
+  ProductModel product = ProductModel();
 
   @override
   Widget build(BuildContext context) {
+    this.productBloc = Provider.productsBloc(context);
     final ProductModel prodData = ModalRoute.of(context).settings.arguments;
 
     if (prodData != null) {
@@ -118,14 +120,16 @@ class _ProductPageState extends State<ProductPage> {
     setState(() { saving = true; });
 
     if (photo != null) {
-      product.fotoUrl = await productsProvider.uploadImage(photo);
+      product.fotoUrl = await productBloc.uploadPicture(photo);
     }
 
     if (product.id == null) {
-      productsProvider.postProduct(product);
+      this._toast();
+      this.productBloc.addProduct(product);
       _showSnackBar('Product created');
     } else {
-      productsProvider.putProduct(product);
+      this._toast();
+      this.productBloc.updateProduct(product);
       _showSnackBar('Product updated');
     }
   }
@@ -158,20 +162,22 @@ class _ProductPageState extends State<ProductPage> {
         fit: BoxFit.cover,
       );
     } else {
-      return Image(
-        image: AssetImage(photo?.path ?? 'assets/no-image.png'),
+      return (photo == null) ? Image(
+        image: AssetImage('assets/no-image.png'),
+        height: 300.0,
+        fit: BoxFit.cover,
+      ) : Image.file(
+        photo,
         height: 300.0,
         fit: BoxFit.cover,
       );
     }
   }
 
-  void _processPicture(ImageSource source) async {
+  _processPicture(ImageSource source) async {
     photo = await ImagePicker.pickImage(
       source: source
     );
-
-    if (photo == null) return;
 
     if (photo != null) {
       product.fotoUrl = null;
@@ -180,11 +186,22 @@ class _ProductPageState extends State<ProductPage> {
     setState(() { });
   }
 
-  void _selectPicture() {
+  _selectPicture() async {
     _processPicture(ImageSource.gallery);
   }
 
-  void _takePicture() async {
+  _takePicture() async {
     _processPicture(ImageSource.camera);
+  }
+
+  void _toast() {
+    Toast.show(
+      "Wait a moment",
+      context,
+      gravity: Toast.BOTTOM,
+      duration: Toast.LENGTH_SHORT,
+      backgroundColor: Colors.deepPurple,
+      textColor: Colors.white
+    );
   }
 }
